@@ -382,12 +382,22 @@ jobs:
 
           BASE_URL="https://github.com/${MANIFEST_REPO}/kernel_manifest.git"
 
+          # 注释原有的错误配置
           #echo "使用 $MANIFEST_REPO 的分支 $MANIFEST_BRANCH 初始化仓库..."
           #repo init -u "$BASE_URL" -b "$MANIFEST_BRANCH" -m "${FILE}.xml" --depth=1 --no-clone-bundle --no-tags
           #repo sync -c -j$(nproc) --no-clone-bundle --no-tags --force-sync
+
+          # 新的同步逻辑：初始化+替换错误分支+容错同步
           echo "泪心@TearGame使用 $MANIFEST_REPO 的分支 oneplus/sm8850_b_16.0.0_oneplus 初始化仓库..."
+          # 1. 初始化repo（指定正确分支）
           repo init -u "$BASE_URL" -b "oneplus/sm8850_b_16.0.0_oneplus" -m "${FILE}.xml" --depth=1 --no-clone-bundle --no-tags
-          repo sync -c -j$(nproc) --no-clone-bundle --no-tags --force-sync
+
+          # 2. 关键步骤：批量替换本地Manifest文件中硬编码的错误分支
+          # 把所有"ks-kernel.lnx.5.0.r3-rel"替换为当前使用的有效分支
+          sed -i "s/ks-kernel.lnx.5.0.r3-rel/oneplus\/sm8850_b_16.0.0_oneplus/g" .repo/manifests/"${FILE}.xml"
+
+          # 3. 容错同步（单线程+跳过不可用项目）
+          repo sync -c -j1 --no-clone-bundle --no-tags --force-sync --skip-unavailable
 
           for dir in kernel_platform/common kernel_platform/msm-kernel; do
             if [ -e "$dir/BUILD.bazel" ]; then
