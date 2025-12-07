@@ -382,8 +382,11 @@ jobs:
 
           BASE_URL="https://github.com/${MANIFEST_REPO}/kernel_manifest.git"
 
-          echo "使用 $MANIFEST_REPO 的分支 $MANIFEST_BRANCH 初始化仓库..."
-          repo init -u "$BASE_URL" -b "$MANIFEST_BRANCH" -m "${FILE}.xml" --depth=1 --no-clone-bundle --no-tags
+          #echo "使用 $MANIFEST_REPO 的分支 $MANIFEST_BRANCH 初始化仓库..."
+          #repo init -u "$BASE_URL" -b "$MANIFEST_BRANCH" -m "${FILE}.xml" --depth=1 --no-clone-bundle --no-tags
+          #repo sync -c -j$(nproc) --no-clone-bundle --no-tags --force-sync
+          echo "泪心@TearGame使用 $MANIFEST_REPO 的分支 oneplus/sm8850_b_16.0.0_oneplus 初始化仓库..."
+          repo init -u "$BASE_URL" -b "oneplus/sm8850_b_16.0.0_oneplus" -m "${FILE}.xml" --depth=1 --no-clone-bundle --no-tags
           repo sync -c -j$(nproc) --no-clone-bundle --no-tags --force-sync
 
           for dir in kernel_platform/common kernel_platform/msm-kernel; do
